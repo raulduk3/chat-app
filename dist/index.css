@@ -1,0 +1,16 @@
+/* For best practice, move CSS below to an external CSS file. */
+@keyframes fadeinall {
+    0% {
+        opacity: 1; }
+    97% {
+        opacity: 0; }
+    98% {
+        opacity: 0;
+        -webkit-transform: translateY(0);
+        transform: translateY(0); }
+    100% {
+        opacity: 0;
+        -webkit-transform: translateY(-100%);
+        transform: translateY(-100%);
+        z-index: -1; } 
+}
