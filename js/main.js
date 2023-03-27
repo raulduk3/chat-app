@@ -1,4 +1,4 @@
-const socket = io();
+const socket = io("ws://18.119.139.37:3000");
 const usersList = document.getElementById('users');
 const registerForm = document.getElementById('register-form');
 
