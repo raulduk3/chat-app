@@ -40,3 +40,40 @@ registerForm.addEventListener('submit', (event) => {
         console.error(err);
     });
 });
+
+//--------------------------------------------------------------------------------------//
+//                                         Socket.io                                    //
+//--------------------------------------------------------------------------------------//
+io.on('connection', (socket) => {
+    console.log('User connected');
+    
+    // Add the user to the online users list
+    pool.query('INSERT INTO online_users (user_id) VALUES (?)', [socket.request.session.userId]);
+    
+    // Emit the list of online users to all clients
+    pool.query('SELECT username FROM users WHERE id IN (SELECT user_id FROM online_users)', (err, rows) => {
+        if (err) {
+            console.error(err);
+        } else {
+            const users = rows.map((row) => row.username);
+            io.emit('online-users', users);
+        }
+    });
+    
+    socket.on('disconnect', () => {
+        console.log('User disconnected');
+        
+        // Remove the user from the online users list
+        pool.query('DELETE FROM online_users WHERE user_id=?', [socket.request.session.userId]);
+        
+        // Emit the list of online users to all clients
+        pool.query('SELECT username FROM users WHERE id IN (SELECT user_id FROM online_users)', (err, rows) => {
+            if (err) {
+                console.error(err);
+            } else {
+                const users = rows.map((row) => row.username);
+                io.emit('online-users', users);
+            }
+        });
+    });
+});
