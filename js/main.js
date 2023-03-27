@@ -1,5 +1,21 @@
 const socket = io('http://localhost:3000');
 
+function getCookie(cname) {
+    let name = cname + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let ca = decodedCookie.split(';');
+    for(let i = 0; i <ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
 // Login form
 const loginForm = document.querySelector('#login-form');
 const loginButton = document.querySelector('#login-btn');
@@ -26,22 +42,22 @@ loginButton.addEventListener('click', async (event) => {
     const password = loginPassword.value;
     
     const response = await fetch('http://localhost:3000/chat/login', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-    });
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ username, password }),
+});
 
-    if (response.ok) {
-        loginForm.classList.add('hidden');
-        chatForm.classList.remove('hidden');
-        registerForm.classList.add('hidden');
-        
-        socket.emit('join', username);
-    } else {
-        alert('Invalid username or password');
-    }
+if (response.ok) {
+    loginForm.classList.add('hidden');
+    chatForm.classList.remove('hidden');
+    registerForm.classList.add('hidden');
+    
+    socket.emit('join', username);
+} else {
+    alert('Invalid username or password');
+}
 });
 
 // Chat form submission
@@ -50,7 +66,7 @@ sendButton.addEventListener('click', (event) => {
     
     const message = chatMessage.value;
     
-    socket.emit('sendMessage', { username: document.cookie, message: message });
+    socket.emit('sendMessage', {token: getCookie('jwt'), message });
     
     chatMessage.value = '';
 });
@@ -58,15 +74,15 @@ sendButton.addEventListener('click', (event) => {
 // Logout button click
 chatLogoutButton.addEventListener('click', async () => {
     const response = await fetch('http://localhost:3000/chat/logout', {
-        method: 'POST',
-    });
+    method: 'POST',
+});
 
-    if (response.ok) {
-        loginForm.classList.remove('hidden');
-        registerForm.classList.remove('hidden');
-        chatForm.classList.add('hidden');
-        socket.disconnect();
-    }
+if (response.ok) {
+    loginForm.classList.remove('hidden');
+    registerForm.classList.remove('hidden');
+    chatForm.classList.add('hidden');
+    socket.disconnect();
+}
 });
 
 // Register button click
@@ -78,27 +94,27 @@ registerButton.addEventListener('click', (event) => {
     const password = document.querySelector('#register-password').value;
     
     fetch('http://localhost:3000/chat/register', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ username, email, password })
-    })
-    .then(response => {
-        if (response.ok) {
-            // Registration was successful
-            alert('Registration successful!');
-        } else {
-            // Registration failed
-            response.json().then(data => {
-                alert(data.message);
-            });
-        }
-    })
-    .catch(error => {
-        console.error(error);
-        alert('Registration failed');
-    });
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ username, email, password })
+})
+.then(response => {
+    if (response.ok) {
+        // Registration was successful
+        alert('Registration successful!');
+    } else {
+        // Registration failed
+        response.json().then(data => {
+            alert(data.message);
+        });
+    }
+})
+.catch(error => {
+    console.error(error);
+    alert('Registration failed');
+});
 });
 
 // Add user to user list

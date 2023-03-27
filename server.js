@@ -26,6 +26,9 @@ const pool = mariadb.createPool({
 app.use(express.json());
 app.use(cors());
 
+// * Active users *
+let active_users = {};
+
 // Register API
 app.post('/chat/register', async (req, res) => {
 	const { username, email, password } = req.body;
@@ -62,8 +65,8 @@ app.post('/chat/register', async (req, res) => {
 
 	// Insert user into database
 	const result = await pool.query(
-	`INSERT INTO users (username, email, password) VALUES (?, ?, ?)`,
-	[username, email, hashedPassword]
+		`INSERT INTO users (username, email, password) VALUES (?, ?, ?)`,
+		[username, email, hashedPassword]
 	);
 
 	if (result.affectedRows === 1) {
@@ -104,12 +107,18 @@ app.post('/chat/login', async (req, res) => {
 		},
 		'secret',
 		{ expiresIn: '1h' }
-		);
+	);
 		
-		// Return JWT as a cookie
-		res.cookie('jwt', token, {
-			httpOnly: true,
-			maxAge: 60 * 60 * 1000,
+	// Return JWT as a cookie
+	res.cookie('jwt', token, {
+		httpOnly: true,
+		maxAge: 60 * 60 * 1000,
+	});
+
+	active_users[token] = ({
+		id: user[0].id,
+		username: user[0].username,
+		token: token
 	});
 		
 	return res.status(200).json({ message: 'Logged in successfully' });
@@ -141,32 +150,34 @@ app.get('/chat', async (req, res) => {
 	}
 });
 
-// Socket.io
-let users = [];
-
 io.on('connection', (socket) => {
 	console.log('User connected');
 	
 	// Add user to users array
-	socket.on('join', (username) => {
-		const user = { id: socket.id, username };
-		users.push(user);
-		io.emit('userList', users);
-	});
-	
-	// Remove user from users array
-	socket.on('disconnect', () => {
-		const index = users.findIndex((user) => user.id === socket.id);
-		if (index !== -1) {
-			users.splice(index, 1);
+	socket.on('join', (token) => {
+		console.log(active_users);
+
+		if(active_users[token]){
 			io.emit('userList', users);
 		}
 	});
 	
+	// Remove user from users array
+	socket.on('disconnect', () => {
+		try {
+			delete active_users[token];
+		}
+		catch {
+			console.log("[ERROR] Not currently an active user...");
+		}
+		console.log(active_users);
+	});
+	
 	// Send message to all users
-	socket.on('sendMessage', (message) => {
-		console.log(message);
-		io.emit('message', { user: socket.id, message });
+	socket.on('sendMessage', ({token, message}) => {
+		if(active_users[token]){
+			io.emit('message', { socketid: socket.id, message: message, username: active_users[token].username });
+		}
 	});
 });
 
