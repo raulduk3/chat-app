@@ -19,16 +19,15 @@
 		<div id="fadein" class="position-fixed w-100 h-100 bg-white" style="animation: fadeinall 1s normal 0.3s both;"></div>
 		
 		<!-------- Forms ---------------------------------------------------------------------------- -->
-		<div id="login-form">
+		<form id="login-form">
 			<h2>Login</h2>
 			<input id="login-username" type="text" id="username" placeholder="Username">
 			<input id="login-password" type="password" id="password" placeholder="Password">
 			<button id="login-btn">Login</button>
-		</div>
+		</form>
 		
-		<div class="register-form">
-			<h2>Register</h2>
-			<form>
+		<form action="/chat/register" method="POST">
+				<h2>Register</h2>
 				<div>
 					<label for="register-username">Username</label>
 					<input type="text" id="register-username" name="register-username" required>
@@ -42,8 +41,7 @@
 					<input type="password" id="register-password" name="register-password" required>
 				</div>
 				<button id="register-button">Register</button>
-			</form>
-		</div>
+		</form>
 		
 		<div id="chat-form" class="hidden">
 			<h2>Chat</h2>

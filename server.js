@@ -2,7 +2,6 @@ const express = require('express');
 const mariadb = require('mariadb');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 const socketio = require('socket.io');
 
 const app = express();
@@ -17,7 +16,7 @@ const io = socketio(server, {
 const pool = mariadb.createPool({
 	host: 'localhost',
 	user: 'root',
-	password: '123',
+	password: 'newpassword',
 	database: 'chatapp',
 	connectionLimit: 5,
 });
@@ -26,8 +25,6 @@ const pool = mariadb.createPool({
 app.use(express.json());
 app.use(cors());
 
-// * Active users *
-let active_users = {};
 
 // Register API
 app.post('/chat/register', async (req, res) => {
@@ -80,8 +77,6 @@ app.post('/chat/register', async (req, res) => {
 app.post('/chat/login', async (req, res) => {
 	const { username, password } = req.body;
 
-	console.log(username + ' ' + password);
-
 	// Check if user exists
 	const user = await pool.query(
 		`SELECT * FROM users WHERE username = ?`,
@@ -99,35 +94,13 @@ app.post('/chat/login', async (req, res) => {
 		return res.status(401).json({ message: 'Invalid username or password' });
 	}
 
-	// Create and sign JWT
-	const token = jwt.sign(
-		{
-			id: user[0].id,
-			username: user[0].username,
-		},
-		'secret',
-		{ expiresIn: '1h' }
-	);
-		
-	// Return JWT as a cookie
-	res.cookie('jwt', token, {
-		httpOnly: true,
-		maxAge: 60 * 60 * 1000,
-	});
-
-	active_users[token] = ({
-		id: user[0].id,
-		username: user[0].username,
-		token: token
-	});
-		
-	return res.status(200).json({ message: 'Logged in successfully' });
+	return res.status(200).json({ message: 'Logged in succesfully' });
 });
 
 // Logout API
 app.post('/chat/logout', async (req, res) => {
-	// Clear JWT cookie
-	res.clearCookie('jwt');
+
+	delete active_users[req.token];
 	
 	return res.status(200).json({ message: 'Logged out successfully' });
 });
@@ -151,37 +124,10 @@ app.get('/chat', async (req, res) => {
 });
 
 io.on('connection', (socket) => {
-	console.log('User connected');
-	
-	// Add user to users array
-	socket.on('join', (token) => {
-		console.log(active_users);
-
-		if(active_users[token]){
-			io.emit('userList', users);
-		}
-	});
-	
-	// Remove user from users array
-	socket.on('disconnect', () => {
-		try {
-			delete active_users[token];
-		}
-		catch {
-			console.log("[ERROR] Not currently an active user...");
-		}
-		console.log(active_users);
-	});
-	
-	// Send message to all users
-	socket.on('sendMessage', ({token, message}) => {
-		if(active_users[token]){
-			io.emit('message', { socketid: socket.id, message: message, username: active_users[token].username });
-		}
-	});
+	console.log('Client connected');
 });
 
 // Start server
-server.listen(3000, () => {
-	console.log('Server started on port 3000');
+server.listen(5000, () => {
+	console.log('Server started on port 5000');
 });
