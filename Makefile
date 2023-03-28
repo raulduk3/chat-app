@@ -1,27 +1,15 @@
-# MakeFile for chat-app
-# server using MariaDB, express, and socket.io 
-# sudo mkdir /var/www/html/chat-app
-# sudo chown ubuntu /var/www/html/chat-app
+# MakeFile for restChat
+# server using C++ Microservice
+# sudo mkdir /var/www/html/restChat
+# sudo chown ubuntu /var/www/html/restChat
 
-.default: all
+all: PutHTML 
 
-all: build
-
-setup:
-	-mkdir /var/www/html/chat-app
-	-mkdir /var/www/html/chat-app/css
-	-mkdir /var/www/html/chat-app/img
-	-mkdir /var/www/html/chat-app/js
-	-sudo chown ubuntu /var/www/html/chat-app
-
-clean:
-	-rm -r /var/www/html/chat-app
-
-build: 
-	cp -r ./css/* /var/www/html/chat-app/css/
-	cp -r ./js/* /var/www/html/chat-app/js/
-
-	cp -r ./dist/* /var/www/html/chat-app/
+PutHTML:
+	cp restChat.html /var/www/html/restChat/
+	cp restChat.css /var/www/html/restChat/
+	cp restChat.js /var/www/html/restChat/
 	
 	echo "Current contents of your HTML directory: "
-	ls -l /var/www/html/chat-app/
+	ls -l /var/www/html/restChat/
+
