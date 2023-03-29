@@ -1,7 +1,8 @@
 class Chatroom {
     constructor(name, users) {
       this.name = name;
-      this.users = users;
+      this.users = new Set(users);
+      this.messages = [];
     }
   }
   
