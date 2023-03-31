@@ -30,7 +30,7 @@ fetch(`http://3.22.149.75:5005/?token=${token}`)
         console.log(err);
     });
 
-// ---- Initialize Socket ---------------------------------------------------------------------------
+// ---- Initialize Socket ----------------------------------------------------------------
 const socket = io('http://3.22.149.75:5005');
 let room = '';
 
@@ -46,20 +46,22 @@ socket.on('join', (res) => {
     {
         room = res.room;
         $('#chatbox').html(res.messages.map(({message, author, timeStamp})=>{
-            return `<p>${timeStamp} | ${author.username}: ${message}</p>`
+            return `<p class="d-flex  flex-row"><span class="flex-fill">${author.username}: ${message}</span><span class="align-self-end">${timeStamp}</span></p>`
         }).join(''));
     }
 });
 
+// ---- Update user list -----------------------------------------------------------------
 socket.on('updateList', ({ users }) => {
     $('#user-list').html(users.map(({username, room})=>{
         return `<li>${username} in ${room}</li>`
     }).join(''));
 });
 
+// ---- Update Messges -------------------------------------------------------------------
 socket.on('message', ({ message, author, timeStamp }) => {
     console.log(message);
-    $('#chatbox').append(`<p>${timeStamp} | ${author.username}: ${message}</p>`);
+    $('#chatbox').append(`<p class="d-flex  flex-row"><span class="flex-fill">${author.username}: ${message}</span><span class="align-self-end">${timeStamp}</span></p>`);
 });
 
 // ---- Send message ---------------------------------------------------------------------
@@ -67,7 +69,7 @@ function sendMessage()
 {
     let message = $('#message-input').val();
 
-    if(!message) { return; }
+    if(!message || message == '' || message == ' ') { return; }
 
     socket.emit('message', {
         message: message,
@@ -83,8 +85,16 @@ $('#send-btn').on('click', (e) => {
     sendMessage();
 });
 
+// ---- Enter for message box ------------------------------------------------------------
+$("#message-input").on("keydown", (e) => {
+    if(e.code == "Enter")
+    {
+        sendMessage();
+    }
+});
+
 // ---- Logout ---------------------------------------------------------------------------
-$('#logout-btn').on('click', (e) => {
+$('#logout').on('click', (e) => {
     e.preventDefault();
 
     fetch(`http://3.22.149.75:5005/chat/logout?token=${token}`)
@@ -97,12 +107,4 @@ $('#logout-btn').on('click', (e) => {
         localStorage.clear();
         window.location.replace("http://3.22.149.75/restChat/");
     });
-});
-
-// ---- Enter for message box ------------------------------------------------------------
-$("#message-input").on("keydown", (e) => {
-    if(e.code == "Enter")
-    {
-        sendMessage();
-    }
 });

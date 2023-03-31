@@ -6,8 +6,8 @@
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         
 		<link rel="stylesheet" type="text/css" href="./restChat.css" />
-		<!--<link rel="stylesheet" type="text/css" href="css/main.css" />
-			<link rel="stylesheet" type="text/css" href="css/normalize.css" /> -->
+<!--	<link rel="stylesheet" type="text/css" href="css/main.css" />
+		<link rel="stylesheet" type="text/css" href="css/normalize.css" /> -->
 			
 		<link rel="icon" href="favicon.png">
 		<meta name="theme-color" content="#009dff">
@@ -17,27 +17,37 @@
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	</head>
 	
-	<body>		
-		<!-- --- Chat ----------------------------------------------------------------------------- -->
-		<div id="chat-form" class="hidden">
-			<h2>Chat</h2>
+	<body>	
+		<div class="container fill p-5  navbar-expand-md d-flex flex-column">
+			<!---- Navbar ----------------------------------------------------------------------------- -->
+			<header class="container">
+				<nav class="navbar navbar-dark fixed-top bg-dark">
+					<a class="navbar-brand" href="/">Kenyon Chat</a>
+				</nav>
+			</header>
 
-			<h6>Online:</h6>
-			<ul id="user-list"></ul>
-			
-			<div class="scrollabletextbox" id="chatbox"></div>
-			<span id="chatinput">
-				<textarea type="text" id="message-input" row="1" col="180" placeholder="Type a message"></textarea>
-				<button type="submit" value="Send" id="send-btn">Send</button>
-			</span>
+			<!-- --- Chat ----------------------------------------------------------------------------- -->
+			<div class="container-fluid mt-5 flex-fill d-flex flex-row">
+				<div class="p-5 text-light bg-dark">
+					<h6>Online:</h6>
+				
+					<ul class="list-group" id="user-list">
+					</ul>
+				</div>
+				<div class="d-flex flex-column flex-grow-1" id="chat-form" class="hidden">		
+					<div class="d-flex justify-content-end flex-column flex-grow-1 p-1" id="chatbox"></div>
+
+					<div class="input-group">
+						<input  id="message-input"  type="text" class="form-control" placeholder="Type a message.">
+						<div class="input-group-append">
+						  <button id="send-btn" class="btn btn-outline-secondary" type="button">Send</button>
+						</div>
+					</div>
+					<button type="button" id="logout" class="btn btn-light ">Logout</button>
+				</div>
+			</div>
 		</div>
 
-		<button id="logout-btn">Logout</button>
-		
-		<footer>
-			<p>&copy; Kenyon CS 2023</p>
-		</footer>
-		
 		<!--[if IE]><div class="position-fixed bottom-0 w-100 p-2 text-bg-dark d-flex justify-content-between"><p>Outdated browser dectected. Please use a modern browser for a better browsing experience.</p><button type="button" class="btn-close btn-close-white" onClick="parentNode.remove()" aria-label="Close"></button></div><![endif]-->
 		<!-- ░░░░░▄▄▄▄▀▀▀▀▀▀▀▀▄▄▄▄▄▄░░░░░░░░ -->
 		<!-- ░░░░░█░░░░▒▒▒▒▒▒▒▒▒▒▒▒░░▀▀▄░░░░ -->

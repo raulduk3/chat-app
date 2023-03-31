@@ -10,11 +10,11 @@ const urlParams = new URLSearchParams(queryString);
 
 if(urlParams.get("failed") == 1)
 {
-    $("#login-output").html('Failed to login.');
+    $("#login-feedback-label").html('Failed to login.');
 }
 else if((urlParams.get("failed") == 0))
 {
-    $("#register-output").html('Registered.');
+    $("#register-feedback-label").html('Registered.');
 }
 
 if(urlParams.get("token"))

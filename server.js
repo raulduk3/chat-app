@@ -8,7 +8,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
-
 const { User } = require('./models/user');
 const { Chatroom } = require('./models/chatroom');
 const { hashString } = require('./utils/hash');
@@ -34,19 +33,19 @@ const userDB = {
 		'username': 'ra',
 		'email': 'alvarez1@kenyon.edu',
 		'password': 'ra',
-		token: ''
+		'token': ''
 	},
 	'ra2': {
 		'username': 'ra2',
 		'email': 'alvarez1@kenyon.edu',
 		'password': 'ra2',
-		token: ''
+		'token': ''
 	},
 	'js': {
 		'username': 'js',
 		'email': 'jskon@kenyon.edu',
 		'password': 'js',
-		token: ''
+		'token': ''
 	}
 };
 const activeUsers = {};
@@ -97,7 +96,7 @@ app.post('/chat/register/', (req, res) => {
 	} 
 	else 
 	{
-		let user  = new User(username, email, password, '');
+		const user  = new User(username, email, password, '');
 		
 		userDB[username] = user;
 
@@ -113,7 +112,6 @@ app.post('/chat/register/', (req, res) => {
 app.post('/chat/login', (req, res) => {
 	res.set('Access-Control-Allow-Origin', '*');
 
-	let result = {};
 	const now = new Date();
 	const username = req.body.username;
 	const password = req.body.password;
@@ -151,12 +149,13 @@ app.post('/chat/login', (req, res) => {
 });
 
 // ---- Logout ---------------------------------------------------------------------------
-
 app.get('/chat/logout', (req, res) => {
 	res.set('Access-Control-Allow-Origin', '*');
+
 	userDB[activeUsers[req.query.token].username].token = '';
 	rooms[activeUsers[req.query.token].room].users.delete(req.query.token);
 	delete activeUsers[req.query.token];
+
 	res.redirect('http://3.22.149.75/restChat');
 });
 
@@ -173,7 +172,7 @@ io.on('connection', function(socket) {
 		}
 		else
 		{
-			currentUser = activeUsers[token];
+			currentUser = { token: token, ...activeUsers[token] };
 			let messages = joinRoom(currentUser.room, token);
 			
 			socket.join(currentUser.room);
@@ -197,6 +196,12 @@ io.on('connection', function(socket) {
 	// ---- Logout ---------------------------------------------------------------------------
 	socket.on('disconnect', () => {
 	   	console.log(' > User disconnected');
+		if(currentUser)
+		{
+			userDB[currentUser.username].token = '';
+			rooms[activeUsers[currentUser.token].room].users.delete(currentUser.token);
+			delete activeUsers[currentUser.token];		
+		}
 		io.emit('updateList', { users: Object.values(activeUsers) });
 	});
  });
