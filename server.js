@@ -118,8 +118,8 @@ app.post('/chat/login', (req, res) => {
 
 	console.log(`${username} logging in.`);
 	console.log(`${password} == ${userDB[username].password}`);
-	// Check if user exist, then if the passwords match
-	if(userDB[username].password ? userDB[username].password : null == password)
+	// Check if the passwords match
+	if(userDB[username].password == password)
 	{
 		let token = hashString(now.toString());
 		let user = userDB[username];
