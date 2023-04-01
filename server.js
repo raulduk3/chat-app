@@ -170,6 +170,7 @@ io.on('connection', function(socket) {
 		if(!activeUsers[token])
 		{
 			socket.emit('join', { status: 'fail' });
+			
 		}
 		else
 		{
@@ -198,16 +199,11 @@ io.on('connection', function(socket) {
 	// ---- Logout ---------------------------------------------------------------------------
 	socket.on('disconnect', () => {
 		console.log(' > User disconnected');
-		if(currentUser)
-		{
-			userDB[currentUser.username].token = '';
-			rooms[activeUsers[currentUser.token].room].users.delete(currentUser.token);
-			delete activeUsers[currentUser.token];		
-		}
+
 		io.emit('updateList', { users: Object.values(activeUsers) });
 	});
- });
- 
+});
+
 
 http.listen(port, () => {
 	console.log(`Server listening  on localhost:${port}`);
