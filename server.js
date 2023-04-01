@@ -118,7 +118,7 @@ app.post('/chat/login', (req, res) => {
 
 	console.log(`${username} logging in.`);
 
-	if(userDB[username] ? userDB[username] : null === password)
+	if(userDB[username] ? userDB[username].password : null === password)
 	{
 		let token = hashString(now.toString());
 		let user = userDB[username];
@@ -195,7 +195,7 @@ io.on('connection', function(socket) {
 
 	// ---- Logout ---------------------------------------------------------------------------
 	socket.on('disconnect', () => {
-	   	console.log(' > User disconnected');
+		console.log(' > User disconnected');
 		if(currentUser)
 		{
 			userDB[currentUser.username].token = '';
