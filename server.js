@@ -118,6 +118,7 @@ app.post('/chat/login', (req, res) => {
 
 	console.log(`${username} logging in.`);
 
+	// Check if user exist, then if the passwords match
 	if(userDB[username] ? userDB[username].password : null === password)
 	{
 		let token = hashString(now.toString());
@@ -191,6 +192,7 @@ io.on('connection', function(socket) {
 		};
 		rooms[room].messages.push(msg);
 		io.to(room).emit('message', msg);
+		console.log(`${activeUsers[token].username} sent "${message}" to ${room}`);
 	});
 
 	// ---- Logout ---------------------------------------------------------------------------
