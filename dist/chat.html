@@ -27,15 +27,17 @@
 			</header>
 
 			<!-- --- Chat ----------------------------------------------------------------------------- -->
-			<div class="container-fluid mt-5 flex-fill d-flex flex-row">
+			<div id="chat" class="container-fluid mt-5 flex-fill d-flex flex-row h-75">
 				<div class="p-5 text-light bg-dark">
 					<h6>Online:</h6>
 				
 					<ul class="list-group" id="user-list">
 					</ul>
 				</div>
-				<div class="d-flex flex-column flex-grow-1" id="chat-form" class="hidden">		
-					<div class="d-flex justify-content-end flex-column flex-grow-1 p-1" id="chatbox"></div>
+				<div class="d-flex flex-column flex-grow-1" id="chatform" class="hidden">		
+					<div class="overflow-auto d-flex flex-column flex-grow-1 p-1" id="chatbox">
+
+					</div>
 
 					<div class="input-group">
 						<input  id="message-input"  type="text" class="form-control" placeholder="Type a message.">

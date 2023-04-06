@@ -46,8 +46,9 @@ socket.on('join', (res) => {
     {
         room = res.room;
         $('#chatbox').html(res.messages.map(({message, author, timeStamp})=>{
-            return `<p class="d-flex  flex-row"><span class="flex-fill">${author.username}: ${message}</span><span class="align-self-end">${timeStamp}</span></p>`
+            return `<p class="d-flex flex-row mt-2 mb-3"><span class="flex-grow-1 d-flex"><span style='font-weight: bold;'>${author.username}:</span> <span class="flex-grow-1 pl-2" style="max-width: 80%; padding-left:5px;">${message}</span><span>${new Date(timeStamp).toLocaleString()}</span></span></p>`
         }).join(''));
+        $('#chatbox').scrollTop($('#chatbox')[0].scrollHeight);
     }
 });
 
@@ -61,7 +62,8 @@ socket.on('updateList', ({ users }) => {
 // ---- Update Messges -------------------------------------------------------------------
 socket.on('message', ({ message, author, timeStamp }) => {
     console.log(message);
-    $('#chatbox').append(`<p class="d-flex  flex-row"><span class="flex-fill">${author.username}: ${message}</span><span class="align-self-end">${timeStamp}</span></p>`);
+    $('#chatbox').append(`<p class="d-flex flex-row mt-2 mb-3"><span class="flex-grow-1 d-flex"><span style='font-weight: bold;'>${author.username}:</span> <span class="flex-grow-1 pl-2" style="max-width: 80%; padding-left:5px;">${message}</span><span>${new Date(timeStamp).toLocaleString()}</span></span></p>`);
+    $('#chatbox').scrollTop($('#chatbox')[0].scrollHeight);
 });
 
 // ---- Send message ---------------------------------------------------------------------
@@ -108,3 +110,6 @@ $('#logout').on('click', (e) => {
         window.location.replace("http://3.22.149.75/restChat/");
     });
 });
+
+// Scroll chatbox to latest messages
+$('#chatbox').scrollTop($('#chatbox')[0].scrollHeight);

@@ -65,6 +65,17 @@ const joinRoom = function(room, token) {
 	return rooms[room].messages;
 };
 
+const leaveRoom = function(room, token) {
+	if(rooms[room])
+	{
+		rooms[room].users.delete(token);
+	}
+	else
+	{
+		return false;
+	}
+}
+
 // ---- Verifies tokens ------------------------------------------------------------------
 app.get('/', (req, res) => {
 	res.set('Access-Control-Allow-Origin', '*');
@@ -186,13 +197,36 @@ io.on('connection', function(socket) {
 	
 	// ---- Message --------------------------------------------------------------------------
 	socket.on('message', ({ message, room, token }) => {
+
+		if (message.split(" ")[0] == '/join') {
+			let newRoom = message.split(" ")[1];
+
+			activeUsers[token].room = newRoom;
+
+			socket.leave(room);
+			socket.join(newRoom);
+			leaveRoom(room, token);
+			
+			let messages = joinRoom(newRoom, token);
+			currentUser = { token: token, ...activeUsers[token] };
+			
+			io.emit('updateList', { users: Object.values(activeUsers) });
+			socket.emit('join', { status: 'success', user: currentUser.username, room: currentUser.room, messages: messages });
+			
+			return;
+		}
+
 		let msg = {
 			message: message,
 			author: activeUsers[token],
 			timeStamp: (new Date()).toUTCString()
 		};
+		
+		activeUsers[token].typing = false;
+
 		rooms[room].messages.push(msg);
 		io.to(room).emit('message', msg);
+
 		console.log(`${activeUsers[token].username} sent "${message}" to ${room}`);
 	});
 
@@ -203,7 +237,6 @@ io.on('connection', function(socket) {
 		io.emit('updateList', { users: Object.values(activeUsers) });
 	});
 });
-
 
 http.listen(port, () => {
 	console.log(`Server listening  on localhost:${port}`);
